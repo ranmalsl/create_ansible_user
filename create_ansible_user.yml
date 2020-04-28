@@ -1,0 +1,26 @@
+---
+- name: setup ansible user
+  hosts: db
+
+  tasks:
+
+        - name: create user
+          user:
+           name: ansible
+           uid: 10001
+           groups: wheel
+
+        - name: copy ansible config to sudoers
+          copy:
+            src: ansible
+            dest: /etc/sudoers.d/
+
+        - name: copy ssh keys
+          authorized_key:
+            user: ansible
+            key: "{{ lookup('file', '/home/ansible/.ssh/id_rsa.pub') }}"
+            state: present
+
+        - name: Disable SELinux
+          selinux:
+            state: disabled
